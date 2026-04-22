@@ -136,6 +136,27 @@ export default function Home() {
   const markersRef = useRef<Map<string, google.maps.Marker>>(new Map());
   const infoWindowsRef = useRef<Map<string, google.maps.InfoWindow>>(new Map());
 
+  // 캐릭터 회전 각도 계산
+  const getCharacterRotation = useCallback(() => {
+    const targetCompany = selectedCompany || filteredCompanies.find(c => c.id === hoveredCompanyId);
+    if (!targetCompany || !map) return 0;
+
+    const mapCenter = map.getCenter();
+    if (!mapCenter) return 0;
+
+    const lat1 = mapCenter.lat();
+    const lon1 = mapCenter.lng();
+    const lat2 = targetCompany.lat;
+    const lon2 = targetCompany.lng;
+
+    const dLon = lon2 - lon1;
+    const y = Math.sin(dLon * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180);
+    const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) - Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon * Math.PI / 180);
+    const bearing = Math.atan2(y, x) * (180 / Math.PI);
+
+    return bearing;
+  }, [selectedCompany, hoveredCompanyId, filteredCompanies, map])
+
   // 검색 및 필터링 로직
   useEffect(() => {
     let filtered = companies;
@@ -312,11 +333,24 @@ export default function Home() {
           <div className="logo-section">
             <Building2 className="logo-icon" />
             <div className="logo-text">
-              <h1 className="site-title">우수 기업 홍보 포털</h1>
+              <h1 className="site-title">기업성장브릿지 맵</h1>
               <p className="site-subtitle">영등포구 · 강서구 · 양천구</p>
             </div>
           </div>
-          <img src="/manus-storage/character_3f2cfc0e.jpg" alt="캐릭터" className="header-character" />
+          <div className="character-container">
+            <img 
+              src="/manus-storage/character_3f2cfc0e.jpg" 
+              alt="캐릭터" 
+              className="header-character" 
+              style={{
+                transform: selectedCompany || hoveredCompanyId ? `rotate(${getCharacterRotation()}deg)` : 'rotate(0deg)',
+                transition: 'transform 0.3s ease'
+              }}
+            />
+            {(selectedCompany || hoveredCompanyId) && (
+              <div className="pointing-arrow" />
+            )}
+          </div>
         </div>
       </header>
 
