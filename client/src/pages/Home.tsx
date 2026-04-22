@@ -198,8 +198,7 @@ export default function Home() {
       });
 
       newMarkers.push(marker);
-      infoWindows.forEach(iw => iw.close());
-      infoWindow.open(map, marker);
+      infoWindows.push(infoWindow);
     });
 
     setMarkers(newMarkers);
@@ -210,7 +209,9 @@ export default function Home() {
       newMarkers.forEach(marker => {
         bounds.extend(marker.getPosition()!);
       });
-      map.fitBounds(bounds);
+      // 패딩 추가 (사이드바 고려)
+      const padding = { top: 50, right: 50, bottom: 50, left: 400 };
+      map.fitBounds(bounds, padding);
     }
   }, [map, mapReady, filteredCompanies]);
 
