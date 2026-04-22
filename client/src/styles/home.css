@@ -2,27 +2,29 @@
  * 우수 기업 홍보 포털 스타일
  * 
  * 설계 철학:
- * - 현대적이고 전문적인 기업 홍보 포털
- * - 깔끔한 레이아웃과 명확한 정보 계층구조
- * - 구글 지도를 중심으로 한 시각적 탐색
+ * - 청록색(Teal) 캐릭터 기반의 현대적이고 친근한 기업 홍보 포털
+ * - 따뜻하고 신뢰감 있는 색상 조합
+ * - 캐릭터의 청록색, 분홍색, 주황색을 활용한 조화로운 디자인
  */
 
 :root {
-  --primary-color: #1e40af;
-  --primary-light: #3b82f6;
-  --primary-dark: #1e3a8a;
-  --secondary-color: #64748b;
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
+  /* 청록색 기반 색상 팔레트 */
+  --primary-color: #20b2aa;
+  --primary-light: #48d1cc;
+  --primary-dark: #008b8b;
+  --secondary-color: #ff6b9d;
+  --accent-color: #ffa500;
+  --success-color: #20b2aa;
+  --warning-color: #ff6b9d;
   --danger-color: #ef4444;
-  --bg-light: #f8fafc;
+  --bg-light: #f0fffe;
   --bg-white: #ffffff;
-  --text-dark: #1e293b;
-  --text-gray: #64748b;
-  --border-color: #e2e8f0;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --text-dark: #1a5f5c;
+  --text-gray: #5a8a87;
+  --border-color: #d0e8e6;
+  --shadow-sm: 0 1px 2px 0 rgba(32, 178, 170, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(32, 178, 170, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(32, 178, 170, 0.15);
 }
 
 * {
@@ -45,7 +47,7 @@ body {
 .header {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
   color: white;
-  padding: 2rem 0;
+  padding: 1.5rem 0;
   box-shadow: var(--shadow-md);
   position: sticky;
   top: 0;
@@ -56,6 +58,9 @@ body {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .logo-section {
@@ -81,6 +86,23 @@ body {
   font-size: 0.875rem;
   opacity: 0.9;
   margin: 0.25rem 0 0 0;
+}
+
+/* 헤더 캐릭터 */
+.header-character {
+  width: 80px;
+  height: auto;
+  opacity: 0.95;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 /* ===== 메인 컨텐츠 ===== */
@@ -113,6 +135,7 @@ body {
   height: fit-content;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
+  border: 2px solid var(--border-color);
 }
 
 /* 검색 섹션 */
@@ -131,7 +154,7 @@ body {
 .search-icon {
   position: absolute;
   left: 12px;
-  color: var(--text-gray);
+  color: var(--primary-color);
   pointer-events: none;
 }
 
@@ -142,12 +165,13 @@ body {
   border-radius: 8px;
   font-size: 0.9375rem;
   transition: all 0.2s ease;
+  background-color: var(--bg-light);
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
 }
 
 /* 필터 섹션 */
@@ -185,7 +209,7 @@ body {
 
 .filter-btn:hover {
   border-color: var(--primary-light);
-  background: rgba(59, 130, 246, 0.05);
+  background: rgba(32, 178, 170, 0.05);
   color: var(--primary-color);
 }
 
@@ -193,6 +217,7 @@ body {
   background: var(--primary-color);
   border-color: var(--primary-color);
   color: white;
+  box-shadow: var(--shadow-md);
 }
 
 /* 기업 목록 섹션 */
@@ -246,18 +271,19 @@ body {
 
 .company-item:hover {
   border-color: var(--primary-light);
-  background: rgba(59, 130, 246, 0.02);
+  background: rgba(32, 178, 170, 0.02);
   transform: translateX(2px);
 }
 
 .company-item.active {
   border-color: var(--primary-color);
-  background: rgba(30, 64, 175, 0.05);
+  background: rgba(32, 178, 170, 0.08);
+  box-shadow: var(--shadow-md);
 }
 
 .company-item.hovered {
   border-color: var(--warning-color);
-  background: rgba(245, 158, 11, 0.05);
+  background: rgba(255, 165, 0, 0.05);
   transform: translateX(2px);
 }
 
@@ -317,6 +343,7 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-md);
   min-height: 600px;
+  border: 2px solid var(--border-color);
 }
 
 .map-section > div {
@@ -331,7 +358,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(26, 95, 92, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -359,6 +386,7 @@ body {
   box-shadow: var(--shadow-lg);
   animation: slideUp 0.3s ease;
   position: relative;
+  border: 2px solid var(--border-color);
 }
 
 @keyframes slideUp {
@@ -400,7 +428,7 @@ body {
   gap: 1rem;
   padding: 2rem 1.5rem 1.5rem;
   border-bottom: 2px solid var(--border-color);
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(32, 178, 170, 0.08) 0%, rgba(72, 209, 204, 0.08) 100%);
 }
 
 .modal-logo {
@@ -413,6 +441,7 @@ body {
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
+  border: 2px solid var(--border-color);
 }
 
 .modal-logo img {
@@ -505,21 +534,21 @@ body {
 }
 
 .badge-cert {
-  background: rgba(30, 64, 175, 0.1);
+  background: rgba(32, 178, 170, 0.1);
   color: var(--primary-color);
-  border: 1px solid rgba(30, 64, 175, 0.2);
+  border: 1px solid rgba(32, 178, 170, 0.2);
 }
 
 .badge-benefit {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--success-color);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(255, 107, 157, 0.1);
+  color: var(--secondary-color);
+  border: 1px solid rgba(255, 107, 157, 0.2);
 }
 
 .badge-env {
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--warning-color);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(255, 165, 0, 0.1);
+  color: var(--accent-color);
+  border: 1px solid rgba(255, 165, 0, 0.2);
 }
 
 .list-items {
@@ -584,6 +613,7 @@ body {
 .website-link:hover {
   background: var(--primary-dark);
   transform: translateX(2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ===== 반응형 ===== */
@@ -605,11 +635,15 @@ body {
   .info-grid {
     grid-template-columns: 1fr;
   }
+
+  .header-character {
+    width: 60px;
+  }
 }
 
 @media (max-width: 768px) {
   .header {
-    padding: 1.5rem 0;
+    padding: 1rem 0;
   }
 
   .logo-text h1 {
@@ -637,6 +671,10 @@ body {
 
   .image-gallery {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .header-character {
+    width: 50px;
   }
 }
 
@@ -671,6 +709,10 @@ body {
   .image-gallery {
     grid-template-columns: 1fr;
   }
+
+  .header-character {
+    width: 40px;
+  }
 }
 
 /* ===== 스크롤바 커스터마이징 ===== */
@@ -687,11 +729,11 @@ body {
 
 .company-list::-webkit-scrollbar-thumb,
 .modal-content::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: var(--primary-light);
   border-radius: 10px;
 }
 
 .company-list::-webkit-scrollbar-thumb:hover,
 .modal-content::-webkit-scrollbar-thumb:hover {
-  background: var(--text-gray);
+  background: var(--primary-color);
 }

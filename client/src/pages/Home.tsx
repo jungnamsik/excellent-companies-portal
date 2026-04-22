@@ -316,6 +316,7 @@ export default function Home() {
               <p className="site-subtitle">영등포구 · 강서구 · 양천구</p>
             </div>
           </div>
+          <img src="/manus-storage/character_3f2cfc0e.jpg" alt="캐릭터" className="header-character" />
         </div>
       </header>
 
