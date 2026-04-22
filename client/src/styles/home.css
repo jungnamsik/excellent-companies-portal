@@ -255,6 +255,12 @@ body {
   background: rgba(30, 64, 175, 0.05);
 }
 
+.company-item.hovered {
+  border-color: var(--warning-color);
+  background: rgba(245, 158, 11, 0.05);
+  transform: translateX(2px);
+}
+
 .company-item-header {
   display: flex;
   justify-content: space-between;

@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, MapPin, Building2, Users, Award, Briefcase, Home as HomeIcon } from 'lucide-react';
 import { MapView } from '@/components/Map';
 import { companies, REGION_NAMES, Company } from '@/data/companies';
 import '../styles/home.css';
 
 /**
- * 설계 철학: 현대적이고 전문적인 기업 홍보 포털
+ * 설계 철학: 구글 지도 저장목록 스타일의 기업 홍보 포털
+ * - 초기: 지도 중심에 포인터 표시
+ * - 기업 선택/마우스 오버: 해당 위치에 핀 표시
  * - 깔끔한 레이아웃과 명확한 정보 계층구조
- * - 구글 지도를 중심으로 한 시각적 탐색
- * - 검색과 필터를 통한 효율적인 기업 정보 접근
  */
 
 interface CompanyDetailModalProps {
@@ -128,10 +128,12 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [hoveredCompanyId, setHoveredCompanyId] = useState<string | null>(null);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>(companies);
   const [mapReady, setMapReady] = useState(false);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
   // 검색 및 필터링 로직
   useEffect(() => {
@@ -160,60 +162,126 @@ export default function Home() {
   const handleMapReady = useCallback((mapInstance: google.maps.Map) => {
     setMap(mapInstance);
     setMapReady(true);
+    
+    // 초기 포인터 마커 추가 (지도 중심)
+    const center = mapInstance.getCenter();
+    if (center) {
+      const initialMarker = new google.maps.Marker({
+        position: center,
+        map: mapInstance,
+        title: '중심 위치',
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+      });
+      markerRef.current = initialMarker;
+    }
   }, []);
 
-  // 지도에 마커 추가
-  useEffect(() => {
-    if (!map || !mapReady) return;
+  // 기업 선택 시 마커 표시
+  const handleCompanySelect = useCallback((company: Company) => {
+    if (!map) return;
+
+    setSelectedCompany(company);
 
     // 기존 마커 제거
-    markers.forEach(marker => marker.setMap(null));
+    if (markerRef.current) {
+      markerRef.current.setMap(null);
+    }
 
-    // 새 마커 추가
-    const newMarkers: google.maps.Marker[] = [];
-    const infoWindows: google.maps.InfoWindow[] = [];
+    // 기존 인포윈도우 닫기
+    if (infoWindowRef.current) {
+      infoWindowRef.current.close();
+    }
 
-    filteredCompanies.forEach(company => {
+    // 새 마커 추가 (빨간 핀)
+    const marker = new google.maps.Marker({
+      position: { lat: company.lat, lng: company.lng },
+      map: map,
+      title: company.name,
+      icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+    });
+    markerRef.current = marker;
+
+    // 인포윈도우 생성
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="padding: 12px; min-width: 220px;">
+          <h4 style="margin: 0 0 8px 0; font-weight: bold; font-size: 14px;">${company.name}</h4>
+          <p style="margin: 0 0 4px 0; font-size: 12px; color: #1e40af; font-weight: 600;">${REGION_NAMES[company.region]}</p>
+          <p style="margin: 0 0 8px 0; font-size: 12px; color: #666;">${company.industry}</p>
+          <p style="margin: 0; font-size: 11px; color: #999;">근로자: ${company.employees.toLocaleString()}명</p>
+        </div>
+      `,
+    });
+    infoWindowRef.current = infoWindow;
+
+    // 인포윈도우 표시
+    infoWindow.open(map, marker);
+
+    // 지도 중심 이동
+    map.setCenter({ lat: company.lat, lng: company.lng });
+    map.setZoom(16);
+  }, [map]);
+
+  // 기업 마우스 오버 시 마커 표시
+  const handleCompanyHover = useCallback((company: Company | null) => {
+    if (!map || !company) {
+      setHoveredCompanyId(null);
+      return;
+    }
+
+    setHoveredCompanyId(company.id);
+
+    // 선택된 기업이 아닌 경우에만 마커 변경
+    if (selectedCompany?.id !== company.id) {
+      // 기존 마커 제거
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+      }
+
+      // 기존 인포윈도우 닫기
+      if (infoWindowRef.current) {
+        infoWindowRef.current.close();
+      }
+
+      // 새 마커 추가 (노란 핀)
       const marker = new google.maps.Marker({
         position: { lat: company.lat, lng: company.lng },
         map: map,
         title: company.name,
+        icon: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
       });
+      markerRef.current = marker;
 
-      const infoWindow = new google.maps.InfoWindow({
-        content: `
-          <div style="padding: 10px; min-width: 200px;">
-            <h4 style="margin: 0 0 5px 0; font-weight: bold;">${company.name}</h4>
-            <p style="margin: 0 0 5px 0; font-size: 12px; color: #666;">${REGION_NAMES[company.region]}</p>
-            <p style="margin: 0; font-size: 12px;">${company.industry}</p>
-          </div>
-        `,
-      });
-
-      marker.addListener('click', () => {
-        // 모든 인포윈도우 닫기
-        infoWindows.forEach(iw => iw.close());
-        infoWindow.open(map, marker);
-        setSelectedCompany(company);
-      });
-
-      newMarkers.push(marker);
-      infoWindows.push(infoWindow);
-    });
-
-    setMarkers(newMarkers);
-
-    // 지도 범위 조정
-    if (newMarkers.length > 0) {
-      const bounds = new google.maps.LatLngBounds();
-      newMarkers.forEach(marker => {
-        bounds.extend(marker.getPosition()!);
-      });
-      // 패딩 추가 (사이드바 고려)
-      const padding = { top: 50, right: 50, bottom: 50, left: 400 };
-      map.fitBounds(bounds, padding);
+      // 지도 중심 이동
+      map.setCenter({ lat: company.lat, lng: company.lng });
+      map.setZoom(16);
     }
-  }, [map, mapReady, filteredCompanies]);
+  }, [map, selectedCompany]);
+
+  // 마우스 아웃 시 선택된 기업으로 복귀
+  const handleCompanyLeave = useCallback(() => {
+    setHoveredCompanyId(null);
+
+    if (selectedCompany && map) {
+      // 선택된 기업의 마커로 복귀
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+      }
+
+      const marker = new google.maps.Marker({
+        position: { lat: selectedCompany.lat, lng: selectedCompany.lng },
+        map: map,
+        title: selectedCompany.name,
+        icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+      });
+      markerRef.current = marker;
+
+      // 인포윈도우 다시 표시
+      if (infoWindowRef.current) {
+        infoWindowRef.current.open(map, marker);
+      }
+    }
+  }, [selectedCompany, map]);
 
   return (
     <div className="home-container">
@@ -288,8 +356,10 @@ export default function Home() {
               {filteredCompanies.map(company => (
                 <div
                   key={company.id}
-                  className={`company-item ${selectedCompany?.id === company.id ? 'active' : ''}`}
-                  onClick={() => setSelectedCompany(company)}
+                  className={`company-item ${selectedCompany?.id === company.id ? 'active' : ''} ${hoveredCompanyId === company.id ? 'hovered' : ''}`}
+                  onClick={() => handleCompanySelect(company)}
+                  onMouseEnter={() => handleCompanyHover(company)}
+                  onMouseLeave={handleCompanyLeave}
                 >
                   <div className="company-item-header">
                     <h4 className="company-item-name">{company.name}</h4>
