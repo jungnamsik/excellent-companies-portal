@@ -337,20 +337,7 @@ export default function Home() {
               <p className="site-subtitle">영등포구 · 강서구 · 양천구</p>
             </div>
           </div>
-          <div className="character-container">
-            <img 
-              src="/manus-storage/character_3f2cfc0e.jpg" 
-              alt="캐릭터" 
-              className="header-character" 
-              style={{
-                transform: selectedCompany || hoveredCompanyId ? `rotate(${getCharacterRotation()}deg)` : 'rotate(0deg)',
-                transition: 'transform 0.3s ease'
-              }}
-            />
-            {(selectedCompany || hoveredCompanyId) && (
-              <div className="pointing-arrow" />
-            )}
-          </div>
+
         </div>
       </header>
 
