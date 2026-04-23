@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -8,6 +9,15 @@ import Home from "./pages/Home";
 
 
 function Router() {
+  // GitHub Pages SPA 라우팅 처리
+  useEffect(() => {
+    const l = window.location;
+    if (l.search[1] === '/') {
+      const decoded = l.search.slice(2).replace(/~and~/g, '&');
+      window.history.replaceState({}, '', l.pathname.slice(0, -1) + decoded + l.hash);
+    }
+  }, []);
+
   return (
     <Switch>
       <Route path={"/"} component={Home} />
